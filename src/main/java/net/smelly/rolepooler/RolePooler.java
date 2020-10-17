@@ -47,7 +47,7 @@ public final class RolePooler {
 			for (Role role : event.getRoles()) {
 				Pool pool = DATA_MANAGER.getPoolForRole(role);
 				if (pool != null) {
-					DATA_MANAGER.addPooledRolesToUser(pool, user);
+					DATA_MANAGER.addPooledRolesToUser(pool, user, true);
 				}
 			}
 		}
@@ -58,7 +58,7 @@ public final class RolePooler {
 			for (Role role : event.getRoles()) {
 				Pool pool = DATA_MANAGER.getPoolForRole(role);
 				if (pool != null) {
-					DATA_MANAGER.removedPooledRolesFromUser(pool, user);
+					DATA_MANAGER.removedPooledRolesFromUser(pool, user, true);
 				}
 			}
 		}

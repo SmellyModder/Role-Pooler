@@ -1,10 +1,7 @@
 package net.smelly.rolepooler;
 
 import com.google.gson.*;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.SelfUser;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -116,10 +113,33 @@ public final class ServerDataManager {
 		}
 	}
 
+	public void updateRolesInPools(Guild guild) {
+		EnumMap<Pool, Role> poolRoleEnumMap = new EnumMap<>(Pool.class);
+		this.pooledRoleMap.forEach((pool, guildRoleMap) -> {
+			Role role = guildRoleMap.get(guild);
+			if (role != null) {
+				poolRoleEnumMap.put(pool, role);
+			}
+		});
+		List<Member> members = guild.getMembers();
+		for (Member member : members) {
+			poolRoleEnumMap.forEach((pool, role) -> {
+				User user = member.getUser();
+				if (member.getRoles().contains(role)) {
+					this.userPoolMap.addPoolToUser(user, pool);
+					this.addPooledRolesToUser(pool, user, false);
+				} else {
+					this.userPoolMap.removePoolFromUser(user, pool);
+					this.removedPooledRolesFromUser(pool, user, false);
+				}
+			});
+		}
+	}
+
 	/**
 	 * Gets all the {@link Role}s pooled to a {@link Pool} and adds them to a {@link User}.
 	 */
-	public void addPooledRolesToUser(Pool pool, User user) {
+	public void addPooledRolesToUser(Pool pool, User user, boolean shouldWrite) {
 		AtomicBoolean added = new AtomicBoolean(false);
 		this.pooledRoleMap.get(pool).forEach((guild, role) -> {
 			if (guild.isMember(RolePooler.BOT.getSelfUser()) && guild.isMember(user)) {
@@ -129,7 +149,7 @@ public final class ServerDataManager {
 				}
 			}
 		});
-		if (added.get() && this.userPoolMap.addPoolToUser(user, pool)) {
+		if (shouldWrite && added.get() && this.userPoolMap.addPoolToUser(user, pool)) {
 			this.writeUserPools();
 		}
 	}
@@ -137,7 +157,7 @@ public final class ServerDataManager {
 	/**
 	 * Gets all the {@link Role}s pooled to a {@link Pool} and removes them from a {@link User}.
 	 */
-	public void removedPooledRolesFromUser(Pool pool, User user) {
+	public void removedPooledRolesFromUser(Pool pool, User user, boolean shouldWrite) {
 		AtomicBoolean removed = new AtomicBoolean(false);
 		this.pooledRoleMap.get(pool).forEach((guild, role) -> {
 			if (guild.isMember(RolePooler.BOT.getSelfUser()) && guild.isMember(user)) {
@@ -147,7 +167,7 @@ public final class ServerDataManager {
 				}
 			}
 		});
-		if (removed.get() && this.userPoolMap.removePoolFromUser(user, pool)) {
+		if (shouldWrite && removed.get() && this.userPoolMap.removePoolFromUser(user, pool)) {
 			this.writeUserPools();
 		}
 	}

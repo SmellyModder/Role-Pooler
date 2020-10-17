@@ -11,4 +11,6 @@ public final class RPCommands {
 	private static final PoolRoleCommand POOL_ROLE_COMMAND = new PoolRoleCommand();
 	@Permissions(Permission.MANAGE_ROLES)
 	private static final ListPoolsCommand LIST_POOLS_COMMAND = new ListPoolsCommand();
+	@Permissions(Permission.ADMINISTRATOR)
+	private static final ResyncUserRolesCommand RESYNC_COMMAND = new ResyncUserRolesCommand();
 }
