@@ -1,0 +1,37 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.0"
+    }
+}
+
+plugins {
+    id "com.github.johnrengelman.shadow" version "2.0.0"
+}
+
+apply plugin: 'java-library'
+apply plugin: 'application'
+
+mainClassName = 'net/smelly/rolepooler/RolePooler'
+
+repositories {
+    jcenter()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'net.dv8tion:JDA:4.2.0_181'
+    implementation 'com.github.SmellyModder:Disparser:1.3.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
+}
+
+shadowJar {
+    manifest {
+        attributes(
+                'Main-Class': 'net.smelly.rolepooler.RolePooler'
+        )
+    }
+}
