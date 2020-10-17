@@ -34,8 +34,8 @@ public final class RolePooler {
 				new RoleListener()
 		);
 		BOT = builder.build();
-		//Sleep current thread for 1 second so Guild Caches can load to have Server Data load properly.
-		Thread.sleep(1000L);
+		//Sleep current thread for 2.5 seconds so Guild Caches can fully load to have Server Data load properly.
+		Thread.sleep(2500L);
 		DATA_MANAGER = new ServerDataManager(args[1]);
 	}
 
