@@ -4,12 +4,12 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.0"
+        classpath "com.github.jengelman.gradle.plugins:shadow:4.0.3"
     }
 }
 
 plugins {
-    id "com.github.johnrengelman.shadow" version "2.0.0"
+    id "com.github.johnrengelman.shadow" version "4.0.3"
 }
 
 apply plugin: 'java-library'
