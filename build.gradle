@@ -20,10 +20,14 @@ mainClassName = 'net/smelly/rolepooler/RolePooler'
 repositories {
     jcenter()
     maven { url 'https://jitpack.io' }
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
 }
 
 dependencies {
-    implementation 'net.dv8tion:JDA:4.2.0_181'
+    implementation 'net.dv8tion:JDA:4.2.1_276'
     implementation 'com.github.SmellyModder:Disparser:1.3.0'
     implementation 'com.google.code.gson:gson:2.8.6'
 }

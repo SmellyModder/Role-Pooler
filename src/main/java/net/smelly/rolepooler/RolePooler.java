@@ -1,16 +1,12 @@
 package net.smelly.rolepooler;
 
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.guild.member.*;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.smelly.rolepooler.commands.RPCommands;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.smelly.disparser.CommandHandler;
 
@@ -34,8 +30,8 @@ public final class RolePooler {
 				new RoleListener()
 		);
 		BOT = builder.build();
-		//Sleep current thread for 2.5 seconds so Guild Caches can fully load to have Server Data load properly.
-		Thread.sleep(2500L);
+		//Sleep current thread for 10 seconds so Guild Caches can fully load to have Server Data load properly.
+		Thread.sleep(10000L);
 		DATA_MANAGER = new ServerDataManager(args[1]);
 	}
 
@@ -66,6 +62,18 @@ public final class RolePooler {
 		@Override
 		public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
 			DATA_MANAGER.checkAndUpdateRolesForUser(event.getGuild(), event.getUser());
+		}
+
+		@Override
+		public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
+			Member member = event.getMember();
+			User user = event.getUser();
+			if (member != null && DATA_MANAGER.isUserInPool(user, Pool.BOOSTER)) {
+				Role boostRole = event.getGuild().getBoostRole();
+				if (boostRole != null && DATA_MANAGER.getPoolForRole(boostRole) == Pool.BOOSTER) {
+					DATA_MANAGER.removedPooledRolesFromUser(Pool.BOOSTER, user, true);
+				}
+			}
 		}
 
 	}

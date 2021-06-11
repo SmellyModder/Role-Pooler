@@ -81,6 +81,11 @@ public final class ServerDataManager {
 		return this.pooledRoleMap.roleToPool.get(role);
 	}
 
+	public boolean isUserInPool(User user, Pool pool) {
+		Set<Pool> pools = this.userPoolMap.get(user);
+		return pools != null && pools.contains(pool);
+	}
+
 	public EnumMap<Pool, Set<Role>> getRoles() {
 		EnumMap<Pool, Set<Role>> map = new EnumMap<>(Pool.class);
 		SelfUser bot = RolePooler.BOT.getSelfUser();
