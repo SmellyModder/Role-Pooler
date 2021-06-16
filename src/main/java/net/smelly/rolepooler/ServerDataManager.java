@@ -43,11 +43,9 @@ public final class ServerDataManager {
 	public void writePooledRoles() {
 		EXECUTOR_SERVICE.execute(() -> {
 			try {
-				synchronized (this.rolePoolPath) {
-					Writer writer = Files.newBufferedWriter(this.rolePoolPath);
-					GSON.toJson(this.pooledRoleMap, writer);
-					writer.close();
-				}
+				Writer writer = Files.newBufferedWriter(this.rolePoolPath);
+				GSON.toJson(this.pooledRoleMap, writer);
+				writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -57,11 +55,9 @@ public final class ServerDataManager {
 	public void writeUserPools() {
 		EXECUTOR_SERVICE.execute(() -> {
 			try {
-				synchronized (this.userPoolMap) {
-					Writer writer = Files.newBufferedWriter(this.userPoolPath);
-					GSON.toJson(this.userPoolMap, writer);
-					writer.close();
-				}
+				Writer writer = Files.newBufferedWriter(this.userPoolPath);
+				GSON.toJson(this.userPoolMap, writer);
+				writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -222,12 +218,18 @@ public final class ServerDataManager {
 					JsonArray entriesJSON = jsonObject.getAsJsonArray(pool.name());
 					entriesJSON.forEach(jsonElement -> {
 						JsonObject entry = jsonElement.getAsJsonObject();
-						Guild guild = RolePooler.BOT.getGuildById(entry.get("guildId").getAsLong());
+						long id = entry.get("guildId").getAsLong();
+						Guild guild = RolePooler.BOT.getGuildById(id);
 						if (guild != null) {
-							Role role = guild.getRoleById(entry.get("roleId").getAsLong());
+							long roleId = entry.get("roleId").getAsLong();
+							Role role = guild.getRoleById(roleId);
 							if (role != null) {
 								pooledRoleMap.putRole(pool, role);
+							} else {
+								System.out.println("WARNING: Couldn't find role with ID " + roleId + " for guild " + guild);
 							}
+						} else {
+							System.out.println("WARNING: Couldn't find guild with ID: " + id);
 						}
 					});
 				}
@@ -280,10 +282,13 @@ public final class ServerDataManager {
 				JsonArray entriesJson = json.getAsJsonObject().getAsJsonArray("entries");
 				entriesJson.forEach(jsonElement -> {
 					JsonObject entryJson = jsonElement.getAsJsonObject();
-					User user = RolePooler.BOT.getUserById(entryJson.get("userId").getAsLong());
+					long id = entryJson.get("userId").getAsLong();
+					User user = RolePooler.BOT.getUserById(id);
 					if (user != null) {
 						JsonArray poolsJson = entryJson.getAsJsonArray("pools");
 						poolsJson.forEach(poolElement -> userPoolMap.addPoolToUser(user, NAME_TO_POOL_MAP.get(poolElement.getAsString())));
+					} else {
+						System.out.println("Couldn't find user with ID: " + id);
 					}
 				});
 				return userPoolMap;
